@@ -471,7 +471,7 @@ impl JifPheader {
     }
 
     /// A view over the underlying [`ITree`]
-    pub fn itree(&self) -> ITreeView {
+    pub fn itree(&self) -> ITreeView<'_> {
         match self {
             JifPheader::Anonymous { itree, .. } => ITreeView::Anon { inner: itree },
             JifPheader::Reference { itree, .. } => ITreeView::Ref { inner: itree },
