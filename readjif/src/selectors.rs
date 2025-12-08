@@ -22,6 +22,9 @@ ord.private_pages                  number of private pages in the ordering secti
 ord.shared_pages                   number of shared pages in the ordering section
 ord.zero_pages                     number of zero pages in the ordering section
 ord.written_to_pages               number of written to pages in the ordering section
+ord.private_written_to_pages       number of written to private pages in the ordering section
+ord.shared_written_to_pages        number of written to shared pages in the ordering section
+ord.zero_written_to_pages          number of written to zero pages in the ordering section
 ord.intervals                      number of intervals in the ordering section
 ord.private_intervals              number of private intervals in the ordering section
 ord.shared_intervals               number of shared intervals in the ordering section
@@ -58,6 +61,9 @@ pub(crate) struct RegionTypeSelector {
     pub(crate) shared: bool,
     pub(crate) total: bool,
     pub(crate) written_to_pages: bool,
+    pub(crate) zero_written_to_pages: bool,
+    pub(crate) private_written_to_pages: bool,
+    pub(crate) shared_written_to_pages: bool,
 }
 
 #[derive(Debug)]
@@ -128,6 +134,9 @@ ord.private_pages                  number of private pages in the ordering secti
 ord.shared_pages                   number of shared pages in the ordering section
 ord.zero_pages                     number of shared pages in the ordering section
 ord.written_to_pages               number of written to pages in the ordering section
+ord.private_written_to_pages       number of written to private pages in the ordering section
+ord.shared_written_to_pages        number of written to shared pages in the ordering section
+ord.zero_written_to_pages          number of written to zero pages in the ordering section
 
 pheader                            select all the pheaders
 pheader[<range>]                   select the pheaders in the range
@@ -268,19 +277,22 @@ impl TryFrom<String> for MaterializedCommand {
                     MaterializedCommand::Ord(OrdCmd::Range(range))
                 } else {
                     let options = [
-                        "",                   // 0
-                        ".len",               // 1
-                        ".files",             // 2
-                        ".vmas",              // 3
-                        ".pages",             // 4
-                        ".private_pages",     // 5
-                        ".shared_pages",      // 6
-                        ".zero_pages",        // 7
-                        ".written_to_pages",  // 8
-                        ".intervals",         // 9
-                        ".private_intervals", // 10
-                        ".shared_intervals",  // 11
-                        ".zero_intervals",    // 12
+                        "",                          // 0
+                        ".len",                      // 1
+                        ".files",                    // 2
+                        ".vmas",                     // 3
+                        ".pages",                    // 4
+                        ".private_pages",            // 5
+                        ".shared_pages",             // 6
+                        ".zero_pages",               // 7
+                        ".written_to_pages",         // 8
+                        ".private_written_to_pages", // 9
+                        ".shared_written_to_pages",  // 10
+                        ".zero_written_to_pages",    // 11
+                        ".intervals",                // 12
+                        ".private_intervals",        // 13
+                        ".shared_intervals",         // 14
+                        ".zero_intervals",           // 15
                     ];
                     let found_options = find_multiple_option(trimmed, suffix, &options)?;
 
@@ -331,20 +343,29 @@ impl TryFrom<String> for MaterializedCommand {
                         if found_options.contains(&8) {
                             selector.written_to_pages = true;
                         }
+                        if found_options.contains(&9) {
+                            selector.private_written_to_pages = true;
+                        }
+                        if found_options.contains(&10) {
+                            selector.shared_written_to_pages = true;
+                        }
+                        if found_options.contains(&11) {
+                            selector.zero_written_to_pages = true;
+                        }
 
                         MaterializedCommand::Ord(OrdCmd::Pages(selector))
                     } else {
                         let mut selector = RegionTypeSelector::default();
-                        if found_options.contains(&9) {
+                        if found_options.contains(&12) {
                             selector.total = true;
                         }
-                        if found_options.contains(&10) {
+                        if found_options.contains(&13) {
                             selector.private = true;
                         }
-                        if found_options.contains(&11) {
+                        if found_options.contains(&14) {
                             selector.shared = true;
                         }
-                        if found_options.contains(&12) {
+                        if found_options.contains(&15) {
                             selector.zero = true;
                         }
 
@@ -474,13 +495,16 @@ impl TryFrom<String> for RawCommand {
                     RawCommand::Ord(OrdCmd::Range(range))
                 } else {
                     let options = [
-                        "",                  // 0
-                        ".len",              // 1
-                        ".pages",            // 2
-                        ".private_pages",    // 3
-                        ".shared_pages",     // 4
-                        ".zero_pages",       // 5
-                        ".written_to_pages", // 6
+                        "",                          // 0
+                        ".len",                      // 1
+                        ".pages",                    // 2
+                        ".private_pages",            // 3
+                        ".shared_pages",             // 4
+                        ".zero_pages",               // 5
+                        ".written_to_pages",         // 6
+                        ".private_written_to_pages", // 7
+                        ".shared_written_to_pages",  // 8
+                        ".zero_written_to_pages",    // 9
                     ];
                     let found_options = find_multiple_option(trimmed, suffix, &options)?;
 
@@ -510,6 +534,15 @@ impl TryFrom<String> for RawCommand {
                         }
                         if found_options.contains(&6) {
                             selector.zero = true;
+                        }
+                        if found_options.contains(&7) {
+                            selector.private_written_to_pages = true;
+                        }
+                        if found_options.contains(&8) {
+                            selector.shared_written_to_pages = true;
+                        }
+                        if found_options.contains(&9) {
+                            selector.zero_written_to_pages = true;
                         }
 
                         RawCommand::Ord(OrdCmd::Pages(selector))

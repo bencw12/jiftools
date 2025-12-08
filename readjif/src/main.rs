@@ -202,7 +202,7 @@ fn select_raw(jif: JifRaw, cmds: Vec<RawCommand>) -> Result<JsonValue, json::Err
                         }
                         if s.zero {
                             json_value.insert(
-                                "ord.zero",
+                                "ord.zero_pages",
                                 ords.iter()
                                     .filter(|o| o.kind() == DataSource::Zero)
                                     .map(|o| o.size())
@@ -211,7 +211,7 @@ fn select_raw(jif: JifRaw, cmds: Vec<RawCommand>) -> Result<JsonValue, json::Err
                         }
                         if s.written_to_pages {
                             json_value.insert(
-                                "ord.written_to",
+                                "ord.written_to_pages",
                                 ords.iter()
                                     .filter(|o| o.written_to())
                                     .map(|o| o.size())
@@ -221,6 +221,33 @@ fn select_raw(jif: JifRaw, cmds: Vec<RawCommand>) -> Result<JsonValue, json::Err
                         if s.total {
                             json_value
                                 .insert("ord.pages", ords.iter().map(|o| o.size()).sum::<u64>())?;
+                        }
+                        if s.private_written_to_pages {
+                            json_value.insert(
+                                "ord.private_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Private)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.shared_written_to_pages {
+                            json_value.insert(
+                                "ord.shared_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Shared)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.zero_written_to_pages {
+                            json_value.insert(
+                                "ord.zero_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Zero)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
                         }
                     }
                     OrdCmd::Intervals(_) => {
@@ -528,6 +555,33 @@ fn select_materialized(jif: Jif, cmds: Vec<MaterializedCommand>) -> json::Result
                         if s.total {
                             json_value
                                 .insert("ord.pages", ords.iter().map(|o| o.size()).sum::<u64>())?;
+                        }
+                        if s.private_written_to_pages {
+                            json_value.insert(
+                                "ord.private_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Private)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.shared_written_to_pages {
+                            json_value.insert(
+                                "ord.shared_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Shared)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.zero_written_to_pages {
+                            json_value.insert(
+                                "ord.zero_written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to() && o.kind() == DataSource::Zero)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
                         }
                     }
                     OrdCmd::Intervals(s) => {
