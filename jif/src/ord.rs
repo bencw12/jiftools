@@ -78,6 +78,11 @@ impl OrdChunk {
         self.vaddr
     }
 
+    /// Whether this ordering chunk is written to or not
+    pub fn written_to(&self) -> bool {
+        self.is_written_to
+    }
+
     /// The address of the last page in the ordering chunk
     pub fn last_page_addr(&self) -> u64 {
         if self.n_pages > 1 {

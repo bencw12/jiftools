@@ -25,6 +25,7 @@
 //! - `ord.private_pages`: number of private pages in the ordering section
 //! - `ord.shared_pages`: number of shared pages in the ordering section
 //! - `ord.zero_pages`: number of zero pages in the ordering section
+//! - `ord.written_pages`: number of written to pages in the ordering section
 //! - `pheader`: select all the pheaders
 //! - `pheader[<range>]`: select the pheaders in the range
 //! - `pheader.len`: number of pheaders (incompatible with the range and field selectors)
@@ -58,6 +59,7 @@
 //! - `ord.private_pages`: number of private pages in the ordering section
 //! - `ord.shared_pages`: number of shared pages in the ordering section
 //! - `ord.zero_pages`: number of zero pages in the ordering section
+//! - `ord.written_pages`: number of written to pages in the ordering section
 //! - `pheader`: select all the pheaders
 //! - `pheader[<range>]`: select the pheaders in the range
 //! - `pheader.len`: number of pheaders (incompatible with the range and field selectors)
@@ -203,6 +205,15 @@ fn select_raw(jif: JifRaw, cmds: Vec<RawCommand>) -> Result<JsonValue, json::Err
                                 "ord.zero",
                                 ords.iter()
                                     .filter(|o| o.kind() == DataSource::Zero)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.written_to_pages {
+                            json_value.insert(
+                                "ord.written_to",
+                                ords.iter()
+                                    .filter(|o| o.written_to())
                                     .map(|o| o.size())
                                     .sum::<u64>(),
                             )?;
@@ -501,6 +512,15 @@ fn select_materialized(jif: Jif, cmds: Vec<MaterializedCommand>) -> json::Result
                                 "ord.zero_pages",
                                 ords.iter()
                                     .filter(|o| o.kind() == DataSource::Zero)
+                                    .map(|o| o.size())
+                                    .sum::<u64>(),
+                            )?;
+                        }
+                        if s.written_to_pages {
+                            json_value.insert(
+                                "ord.written_to_pages",
+                                ords.iter()
+                                    .filter(|o| o.written_to())
                                     .map(|o| o.size())
                                     .sum::<u64>(),
                             )?;

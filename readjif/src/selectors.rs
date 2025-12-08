@@ -21,6 +21,7 @@ ord.pages                          number of pages in the ordering section
 ord.private_pages                  number of private pages in the ordering section
 ord.shared_pages                   number of shared pages in the ordering section
 ord.zero_pages                     number of zero pages in the ordering section
+ord.written_to_pages               number of written to pages in the ordering section
 ord.intervals                      number of intervals in the ordering section
 ord.private_intervals              number of private intervals in the ordering section
 ord.shared_intervals               number of shared intervals in the ordering section
@@ -56,6 +57,7 @@ pub(crate) struct RegionTypeSelector {
     pub(crate) private: bool,
     pub(crate) shared: bool,
     pub(crate) total: bool,
+    pub(crate) written_to_pages: bool,
 }
 
 #[derive(Debug)]
@@ -125,6 +127,7 @@ ord.size                           number of pages in the ordering section
 ord.private_pages                  number of private pages in the ordering section
 ord.shared_pages                   number of shared pages in the ordering section
 ord.zero_pages                     number of shared pages in the ordering section
+ord.written_to_pages               number of written to pages in the ordering section
 
 pheader                            select all the pheaders
 pheader[<range>]                   select the pheaders in the range
@@ -273,10 +276,11 @@ impl TryFrom<String> for MaterializedCommand {
                         ".private_pages",     // 5
                         ".shared_pages",      // 6
                         ".zero_pages",        // 7
-                        ".intervals",         // 8
-                        ".private_intervals", // 9
-                        ".shared_intervals",  // 10
-                        ".zero_intervals",    // 11
+                        ".written_to_pages",  // 8
+                        ".intervals",         // 9
+                        ".private_intervals", // 10
+                        ".shared_intervals",  // 11
+                        ".zero_intervals",    // 12
                     ];
                     let found_options = find_multiple_option(trimmed, suffix, &options)?;
 
@@ -324,20 +328,23 @@ impl TryFrom<String> for MaterializedCommand {
                         if found_options.contains(&7) {
                             selector.zero = true;
                         }
+                        if found_options.contains(&8) {
+                            selector.written_to_pages = true;
+                        }
 
                         MaterializedCommand::Ord(OrdCmd::Pages(selector))
                     } else {
                         let mut selector = RegionTypeSelector::default();
-                        if found_options.contains(&8) {
+                        if found_options.contains(&9) {
                             selector.total = true;
                         }
-                        if found_options.contains(&9) {
+                        if found_options.contains(&10) {
                             selector.private = true;
                         }
-                        if found_options.contains(&10) {
+                        if found_options.contains(&11) {
                             selector.shared = true;
                         }
-                        if found_options.contains(&11) {
+                        if found_options.contains(&12) {
                             selector.zero = true;
                         }
 
@@ -467,12 +474,13 @@ impl TryFrom<String> for RawCommand {
                     RawCommand::Ord(OrdCmd::Range(range))
                 } else {
                     let options = [
-                        "",               // 0
-                        ".len",           // 1
-                        ".pages",         // 2
-                        ".private_pages", // 3
-                        ".shared_pages",  // 4
-                        ".zero_pages",    // 5
+                        "",                  // 0
+                        ".len",              // 1
+                        ".pages",            // 2
+                        ".private_pages",    // 3
+                        ".shared_pages",     // 4
+                        ".zero_pages",       // 5
+                        ".written_to_pages", // 6
                     ];
                     let found_options = find_multiple_option(trimmed, suffix, &options)?;
 
@@ -498,6 +506,9 @@ impl TryFrom<String> for RawCommand {
                             selector.shared = true;
                         }
                         if found_options.contains(&5) {
+                            selector.zero = true;
+                        }
+                        if found_options.contains(&6) {
                             selector.zero = true;
                         }
 
