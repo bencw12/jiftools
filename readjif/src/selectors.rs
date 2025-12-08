@@ -326,6 +326,10 @@ impl TryFrom<String> for MaterializedCommand {
                         || found_options.contains(&5)
                         || found_options.contains(&6)
                         || found_options.contains(&7)
+                        || found_options.contains(&8)
+                        || found_options.contains(&9)
+                        || found_options.contains(&10)
+                        || found_options.contains(&11)
                     {
                         let mut selector = RegionTypeSelector::default();
                         if found_options.contains(&4) {
