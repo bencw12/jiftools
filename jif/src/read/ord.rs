@@ -31,12 +31,14 @@ impl OrdChunk {
         };
 
         let n_pages = read_u64(r, &mut buffer)?;
+        let phdr = read_u64(r, &mut buffer)?;
         Ok(OrdChunk {
             timestamp_us,
             vaddr: vaddr & ORD_FLAG_MASK,
             n_pages,
             kind,
             is_written_to,
+            phdr: phdr as usize,
         })
     }
 }

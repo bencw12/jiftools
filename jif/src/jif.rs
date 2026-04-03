@@ -227,7 +227,7 @@ impl Jif {
 
         // merge chunks
         let mut chunks = Vec::with_capacity(ords.len());
-        let mut mergeable_chunk = OrdChunk::new(0, 0, 0, DataSource::Zero);
+        let mut mergeable_chunk = OrdChunk::new(0, 0, 0, DataSource::Zero, 0);
         for (_addr, chunk) in ords {
             if !mergeable_chunk.merge_page(self, chunk) {
                 // we couldn't merge, push
@@ -309,7 +309,7 @@ impl Jif {
     }
 
     // Find the pheader (by index) that maps a particular address
-    pub(crate) fn mapping_pheader_idx(&self, vaddr: u64) -> Option<usize> {
+    pub fn mapping_pheader_idx(&self, vaddr: u64) -> Option<usize> {
         self.pheaders
             .iter()
             .enumerate()

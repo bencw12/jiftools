@@ -16,9 +16,11 @@ impl OrdChunk {
         if self.is_written_to {
             vaddr |= ORD_WRITE_FLAG
         }
+
         w.write_all(&self.timestamp_us.to_le_bytes())?;
         w.write_all(&vaddr.to_le_bytes())?;
         w.write_all(&self.n_pages.to_le_bytes())?;
+        w.write_all(&self.phdr.to_le_bytes())?;
         Ok(OrdChunk::serialized_size())
     }
 }

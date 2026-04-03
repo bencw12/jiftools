@@ -15,6 +15,13 @@ fn to_ord_chunk(jif: &Jif, access: TimestampedAccess) -> OrdChunk {
                 )
             })
             .source,
+        jif.mapping_pheader_idx(access.masked_addr() as u64)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Warning: address in ordering does not resolve to a pheader: {}",
+                    access.masked_addr()
+                )
+            }),
     )
 }
 
