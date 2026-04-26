@@ -49,7 +49,13 @@ impl OrdChunk {
     /// Create a new ordering chunk
     ///
     /// Will silently clamp the `vaddr`
-    pub fn new(timestamp_us: u64, raw_vaddr: u64, n_pages: u64, kind: DataSource, phdr: usize) -> Self {
+    pub fn new(
+        timestamp_us: u64,
+        raw_vaddr: u64,
+        n_pages: u64,
+        kind: DataSource,
+        phdr: usize,
+    ) -> Self {
         let is_written_to = Self::raw_addr_written_to(raw_vaddr);
         let vaddr = Self::sanitize_addr(raw_vaddr);
         OrdChunk {
@@ -162,7 +168,7 @@ impl OrdChunk {
 
             let kind = jif
                 .resolve(head)
-                .expect("exicursorsting ord chunks should be mapped")
+                .expect("existing ord chunks should be mapped")
                 .source;
             ords.push(OrdChunk {
                 timestamp_us: self.timestamp_us,

@@ -144,6 +144,17 @@ fn select_raw(jif: JifRaw, cmds: Vec<RawCommand>) -> Result<JsonValue, json::Err
                     }
                     OrdCmd::Vmas => panic!("cannot get vmas for an ord chunk in a raw JIF"),
                     OrdCmd::Files => panic!("cannot get files for an ord chunk in a raw JIF"),
+                    OrdCmd::Contains(addr) => {
+                        let found: Vec<_> = ords
+                            .iter()
+                            .filter(|o| o.addr() <= addr && addr < o.end())
+                            .collect();
+                        if found.is_empty() {
+                            json_value.insert("ord.contains", JsonValue::Null)?;
+                        } else {
+                            json_value.insert("ord.contains", format!("{found:#x?}"))?;
+                        }
+                    }
                     OrdCmd::Range(IndexRange::RightOpen { start }) => {
                         json_value.insert(
                             "ord",
@@ -478,6 +489,17 @@ fn select_materialized(jif: Jif, cmds: Vec<MaterializedCommand>) -> json::Result
                         )?;
                     }
                     OrdCmd::Files => panic!("cannot get files for an ord chunk in a raw JIF"),
+                    OrdCmd::Contains(addr) => {
+                        let found: Vec<_> = ords
+                            .iter()
+                            .filter(|o| o.addr() <= addr && addr < o.end())
+                            .collect();
+                        if found.is_empty() {
+                            json_value.insert("ord.contains", JsonValue::Null)?;
+                        } else {
+                            json_value.insert("ord.contains", format!("{found:#x?}"))?;
+                        }
+                    }
                     OrdCmd::Range(IndexRange::RightOpen { start }) => {
                         json_value.insert(
                             "ord",

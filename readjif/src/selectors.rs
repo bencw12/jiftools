@@ -29,6 +29,7 @@ ord.intervals                      number of intervals in the ordering section
 ord.private_intervals              number of private intervals in the ordering section
 ord.shared_intervals               number of shared intervals in the ordering section
 ord.zero_intervals                 number of zero intervals in the ordering section
+ord.contains(<hex_addr>)           find the ord chunk containing the given address
 
 pheader                            select all the pheaders
 pheader[<range>]                   select the pheaders in the range
@@ -86,6 +87,7 @@ pub(crate) enum OrdCmd {
     Pages(RegionTypeSelector),
     // Number of intervals
     Intervals(RegionTypeSelector),
+    Contains(u64),
 }
 
 #[derive(Debug, Default)]
@@ -137,6 +139,7 @@ ord.written_to_pages               number of written to pages in the ordering se
 ord.private_written_to_pages       number of written to private pages in the ordering section
 ord.shared_written_to_pages        number of written to shared pages in the ordering section
 ord.zero_written_to_pages          number of written to zero pages in the ordering section
+ord.contains(<hex_addr>)           find the ord chunk containing the given address
 
 pheader                            select all the pheaders
 pheader[<range>]                   select the pheaders in the range
@@ -275,6 +278,17 @@ impl TryFrom<String> for MaterializedCommand {
                     }
 
                     MaterializedCommand::Ord(OrdCmd::Range(range))
+                } else if let Some(rest) = suffix.strip_prefix(".contains(") {
+                    let hex_str = rest
+                        .strip_suffix(')')
+                        .ok_or_else(|| anyhow::anyhow!("missing closing ')' in ord.contains()"))?
+                        .trim()
+                        .trim_start_matches("0x")
+                        .trim_start_matches("0X");
+                    let addr = u64::from_str_radix(hex_str, 16).map_err(|_| {
+                        anyhow::anyhow!("invalid hex address in ord.contains(): {}", rest)
+                    })?;
+                    MaterializedCommand::Ord(OrdCmd::Contains(addr))
                 } else {
                     let options = [
                         "",                          // 0
@@ -497,6 +511,17 @@ impl TryFrom<String> for RawCommand {
                     }
 
                     RawCommand::Ord(OrdCmd::Range(range))
+                } else if let Some(rest) = suffix.strip_prefix(".contains(") {
+                    let hex_str = rest
+                        .strip_suffix(')')
+                        .ok_or_else(|| anyhow::anyhow!("missing closing ')' in ord.contains()"))?
+                        .trim()
+                        .trim_start_matches("0x")
+                        .trim_start_matches("0X");
+                    let addr = u64::from_str_radix(hex_str, 16).map_err(|_| {
+                        anyhow::anyhow!("invalid hex address in ord.contains(): {}", rest)
+                    })?;
+                    RawCommand::Ord(OrdCmd::Contains(addr))
                 } else {
                     let options = [
                         "",                          // 0
